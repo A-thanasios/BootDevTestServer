@@ -4,13 +4,13 @@ import { apiConfig } from "../config.js";
 
 export function MetricsInc(req: Request, res: Response, next: NextFunction)
     {
-        if (req.url.endsWith("/metrics") || req.url.endsWith("/reset"))
+        if (req.url.startsWith("/app"))
         {
+            apiConfig.fileserverHits++;
             next();
         }
         else
         {
-            apiConfig.fileserverHits++;
             next();
         }
     }

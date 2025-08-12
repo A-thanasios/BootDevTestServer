@@ -5,17 +5,27 @@ import { LogResponses } from "./middleware/logResponses.js";
 import { handlerReqNm } from "./handlers/reqNum.js";
 import {handlerReset} from "./handlers/reset.js";
 import {MetricsInc} from "./middleware/fileServerHits.js";
-
+import {handlerValidateChirp} from "./handlers/validateChirp.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 const app = express();
 const PORT = 8080;
+
+app.use(express.json());
 
 app.use(LogResponses)
 app.use(MetricsInc);
 app.use("/app", express.static("./src/app"));
 
-app.get("/healthz", handlerReadiness);
-app.get("/metrics", handlerReqNm);
-app.get("/reset", handlerReset);
+app.get("/api/healthz", handlerReadiness);
+app.get("/admin/metrics", handlerReqNm);
+
+app.post("/admin/reset", handlerReset);
+app.post("/api/validate_chirp", (req, res, next) => {
+    Promise.resolve(handlerValidateChirp(req, res)).catch(next);
+});
+
+app.use(errorHandler);
+
 
 app.listen(PORT, () =>
 {
