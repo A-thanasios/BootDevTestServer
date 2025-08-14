@@ -5,7 +5,7 @@ import postgres, { Sql } from "postgres";
 import * as schema from "./schema.js";
 import { apiConfig } from "../config.js";
 
-const conn: Sql<{}> = postgres(apiConfig.db.url);
+const conn = postgres(apiConfig.db.url);
 const migrationClient = postgres(apiConfig.db.url, { max: 1 });
 await migrate(drizzle(migrationClient), apiConfig.db.migrationConfig);
 

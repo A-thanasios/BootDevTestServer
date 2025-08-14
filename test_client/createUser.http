@@ -1,0 +1,7 @@
+POST localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "email": "saul@bettercall.com",
+  "password": "123456"
+}

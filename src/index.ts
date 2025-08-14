@@ -5,8 +5,20 @@ import { LogResponses } from "./middleware/logResponses.js";
 import { handlerReqNm } from "./handlers/reqNum.js";
 import {handlerReset} from "./handlers/reset.js";
 import {MetricsInc} from "./middleware/fileServerHits.js";
-import {handlerValidateChirp} from "./handlers/validateChirp.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import { createNewUser } from "./handlers/db/user/createUser.js";
+import { createNewChirp } from "./handlers/db/chirp/createNewChirp.js";
+import { readChirps } from "./handlers/db/chirp/readChrips.js";
+import { handleLogin } from "./handlers/db/user/handleLogin.js";
+import { handleRefresh } from "./handlers/db/user/handleRefresh.js";
+import { getBearerToken } from "./auth.js";
+import { readRefreshToken, revokeRefreshToken } from "./db/queries/refreshToken.js";
+import { handleRevoke } from "./handlers/db/user/handleRevoke.js";
+import { handleUpdateUser } from "./handlers/db/user/handleUpdateUser.js";
+import { deleteChirp } from "./db/queries/chirps.js";
+import { deleteUserChirp } from "./handlers/db/chirp/deleteUserChirp.js";
+import { handleWebhook } from "./handlers/db/webhooks/handleWebhook.js";
+
 const app = express();
 const PORT = 8080;
 
@@ -19,10 +31,22 @@ app.use("/app", express.static("./src/app"));
 app.get("/api/healthz", handlerReadiness);
 app.get("/admin/metrics", handlerReqNm);
 
+app.post("/api/login", handleLogin);
+
+app.get("/api/chirps/", readChirps);
+app.get("/api/chirps/:id", readChirps);
+app.post("/api/chirps", createNewChirp);
+app.delete("/api/chirps/:id", deleteUserChirp);
+
 app.post("/admin/reset", handlerReset);
-app.post("/api/validate_chirp", (req, res, next) => {
-    Promise.resolve(handlerValidateChirp(req, res)).catch(next);
-});
+
+app.post("/api/users", createNewUser);
+app.post("/api/polka/webhooks", handleWebhook);
+app.put("/api/users", handleUpdateUser);
+
+app.post("/api/refresh", handleRefresh)
+
+app.post("/api/revoke", handleRevoke)
 
 app.use(errorHandler);
 

@@ -7,6 +7,6 @@ export function errorHandler(err, req, res, next) {
         res.status(400).json({ error: err.message });
     }
     else {
-        res.status(500).send("Internal Server Error");
+        res.status(500).send({ error: err.message });
     }
 }
